@@ -304,3 +304,99 @@ public interface HDMIDisplay {
 
 - **AgentContainerTest** :
 ![AgentContainerTest](capture/img_4.png)
+
+### 6. Implémentation des Aspects Technique
+- **LogAspect** : Aspect pour la journalisation.
+
+```java
+package elhanchir.mohamed.aspect;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Log {
+}
+```
+
+- **Création l'aspect de journalisation** :
+
+```java
+package elhanchir.mohamed.aspect;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+
+    @Pointcut("@annotation(elhanchir.mohamed.aspect.Log)")
+    public void logAnnotatedMethods() {
+    }
+
+    @Around("logAnnotatedMethods()")
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+        Object proceed = joinPoint.proceed();
+        long executionTime = System.currentTimeMillis() - start;
+        System.out.println(joinPoint.getSignature() + " exécuté en " + executionTime + "ms");
+        return proceed;
+    }
+}
+```
+
+
+- **CachableAspect** : Aspect pour le cache.
+
+```java
+package elhanchir.mohamed.aspect;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Cachable {
+}
+```
+
+- **Création l'aspect de cache** :
+
+```java
+package elhanchir.mohamed.aspect;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Pointcut;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CachingAspect {
+    private final Map<String, Object> cache = new HashMap<>();
+
+    @Pointcut("@annotation(elhanchir.mohamed.aspect.Cachable)")
+    public void cachableMethods() {
+    }
+
+    @Around("cachableMethods()")
+    public Object cacheResult(ProceedingJoinPoint joinPoint) throws Throwable {
+        String key = joinPoint.getSignature().toString();
+        if (cache.containsKey(key)) {
+            System.out.println("Returning cached result for " + key);
+            return cache.get(key);
+        }
+
+        Object result = joinPoint.proceed();
+        cache.put(key, result);
+        return result;
+    }
+}
+```
