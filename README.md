@@ -117,3 +117,130 @@ public class Transaction {
 
 
 - **TransactionBuilder** : Classe Builder pour créer des transactions.
+    
+```java
+package elhanchir.mohamed.transaction;
+
+import java.util.Date;
+
+public class TransactionBuilder {
+
+        private String id;
+        private Date date;
+        private double amount;
+        private String type;
+
+        public TransactionBuilder setId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public TransactionBuilder setDate(Date date) {
+            this.date = date;
+            return this;
+        }
+
+        public TransactionBuilder setAmount(double amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public TransactionBuilder setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Transaction build() {
+            return new Transaction(id, date, amount, type);
+        }
+
+}
+   ```
+
+- **TransactionTest** :
+![TransactionTest](capture/img_2.png)
+
+### 4. Implémentation et Tests de la Classe Agent
+- **Agent** : Classe principale représentant un agent.
+
+```java
+package elhanchir.mohamed.agent;
+
+
+import elhanchir.mohamed.transaction.Transaction;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class Agent implements Observer, Observable {
+    private String name;
+    private List<Transaction> transactions;
+    private Set<Observer> observers;
+    private NotificationStrategy strategy;
+
+    public Agent(String name) {
+        this.name = name;
+        this.transactions = new ArrayList<>();
+        this.observers = new HashSet<>();
+        this.strategy = new DefaultStrategy(); // Stratégie par défaut
+    }
+
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+        notifyObservers(new NotificationEvent(this.name, transaction));
+    }
+
+    @Override
+    public void subscribe(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void unsubscribe(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(NotificationEvent event) {
+        for (Observer observer : observers) {
+            observer.update(event);
+        }
+    }
+
+    @Override
+    public void update(NotificationEvent event) {
+        strategy.handleNotification(event);
+    }
+
+    public void setStrategy(NotificationStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public Transaction getTransactionWithLargestAmount() {
+        return transactions.stream()
+                .max((t1, t2) -> Double.compare(t1.getAmount(), t2.getAmount()))
+                .orElse(null);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    @Override
+    public String toString() {
+        return "Agent{" +
+                "name='" + name + '\'' +
+                ", transactions=" + transactions +
+                '}';
+    }
+}
+```
+
+- **AgentTest** :
+![AgentTest](capture/img_3.png)
