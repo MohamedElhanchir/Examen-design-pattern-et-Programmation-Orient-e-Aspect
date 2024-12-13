@@ -41,3 +41,8 @@ L'application utilise divers **design patterns** pour assurer une architecture c
     - Une annotation `@Cachable` pour optimiser la méthode retournant la transaction au montant le plus élevé.
 - **Sécurité** :
     - Une annotation `@SecuredBy(roles={...})` gère l'accès en fonction des rôles utilisateurs.
+
+## Structure du Projet
+### 1. Diagramme UML
+
+![UML Diagram](capture/img.png)
